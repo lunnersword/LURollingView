@@ -7,9 +7,11 @@
 //
 
 #import "LUViewController.h"
+#import <LURollingView/LURollingLabel.h>
 
 @interface LUViewController ()
-
+@property (nonatomic, strong) UIButton *button;
+@property (nonatomic, strong) LURollingLabel *rollingLabel;
 @end
 
 @implementation LUViewController
@@ -18,7 +20,28 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    self.button = [UIButton buttonWithType:UIButtonTypeSystem];
+    self.button.frame  = CGRectMake(self.view.bounds.size.width*0.25, self.view.bounds.size.height - 50, self.view.bounds.size.width * 0.5, 50);
+    [self.button setTitle:@"Start Animation" forState:UIControlStateNormal];
+    [self.button addTarget:self action:@selector(doButton) forControlEvents:UIControlEventTouchUpInside];
+
+    self.rollingLabel = [LURollingLabel new];
+    self.rollingLabel.frame = (CGRectMake(0, 300, self.view.bounds.size.width, 100));
+    self.rollingLabel.texts = @[@"fuck ", @"do you love me", @"someOne payed someone some momey", @"you are young"];
+    self.rollingLabel.rollingAnyway = YES;
+    
+    [self.view addSubview:self.button];
+    [self.view addSubview:self.rollingLabel];
+
 }
+- (void)doButton {
+    [self.rollingLabel start];
+    //    [self doTransitionCircile];
+    //[self doTransitionAnimation];
+    //    [self transitionWithCIFilter];
+    //    [self animationInUIView];
+}
+
 
 - (void)didReceiveMemoryWarning
 {

@@ -1,0 +1,6 @@
+framework module LURollingView {
+  umbrella header "LURollingView-umbrella.h"
+
+  export *
+  module * { export * }
+}
