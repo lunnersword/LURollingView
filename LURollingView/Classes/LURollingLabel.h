@@ -22,6 +22,7 @@
 @property (nonatomic, assign) CGFloat innerGap;
 @property (nonatomic, assign) NSUInteger repeatCount;
 @property (nonatomic, assign) BOOL rollingAnyway;
+@property (nonatomic, assign) BOOL respondsToTap;
 
 @property (nonatomic, readonly) BOOL isRolling;
 

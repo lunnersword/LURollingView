@@ -13,6 +13,8 @@
 @property (nonatomic, readonly) BOOL needRolling;
 @property (nonatomic, strong) NSMutableArray<UILabel *> *labels;
 @property (nonatomic, strong) UIScrollView *scrollView;
+@property (nonatomic, strong) UITapGestureRecognizer *tap;
+@property (nonatomic, strong) UITapGestureRecognizer *doubleTap;
 
 @end
 
@@ -44,12 +46,9 @@
         _edgeInsets = UIEdgeInsetsMake(5, 0, 5, 0);
         self.scrollView.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
         [self addSubview:self.scrollView];
-        
-        UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(suspend)];
-        UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(startRolling:)];
-        doubleTap.numberOfTapsRequired = 2;
-        [self addGestureRecognizer:tap];
-        [self addGestureRecognizer:doubleTap];
+        [self addGestureRecognizer:self.tap];
+        [self addGestureRecognizer:self.doubleTap];
+
     }
     return self;
 }
@@ -228,6 +227,22 @@
     }];
 }
 
+- (UITapGestureRecognizer *)tap {
+    if (!_tap) {
+        _tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(suspend)];
+    }
+    return _tap;
+}
+
+- (UITapGestureRecognizer *)doubleTap {
+    if (!_doubleTap) {
+        _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(startRolling:)];
+        _doubleTap.numberOfTapsRequired = 2;
+
+    }
+    return _doubleTap;
+}
+
 - (UIColor *)textColor {
     return [UIColor blackColor];
 }
@@ -272,5 +287,13 @@
     return _scrollView;
 }
 
+- (void)setRespondsToTap:(BOOL)respondsToTap {
+    _respondsToTap = respondsToTap;
+    if (_respondsToTap) {
+        self.userInteractionEnabled = YES;
+    } else {
+        self.userInteractionEnabled = NO;
+    }
+}
 
 @end
