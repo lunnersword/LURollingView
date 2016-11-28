@@ -26,8 +26,8 @@
     [self.button setTitle:@"Start Animation" forState:UIControlStateNormal];
     [self.button addTarget:self action:@selector(doButton) forControlEvents:UIControlEventTouchUpInside];
 
-    self.rollingLabel = [[LURollingLabel alloc] initWithFrame:CGRectZero rollModel:LURollingLabelRollModeGapIndividually direction:LURollingLabelRollDiretionHorizontal];
-    self.rollingLabel.frame = (CGRectMake(0, 300, self.view.bounds.size.width, 100));
+    self.rollingLabel = [[LURollingLabel alloc] initWithFrame:CGRectZero rollModel:LURollingLabelRollModeGap direction:LURollingLabelRollDiretionVertical];
+    self.rollingLabel.frame = (CGRectMake(0, 300, self.view.bounds.size.width, 30));
     self.rollingLabel.individualTapBlock = ^(NSInteger index, UIView *view) {
         NSLog(@"INDIVIDUAL VIEW Tapped at index: %ld", index);
     };
