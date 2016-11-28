@@ -19,28 +19,30 @@ typedef NS_ENUM(NSInteger, LURollingLabelRollDiretion) {
     LURollingLabelRollDiretionVertical
 };
 
-typedef void (^individualViewTapCallback)(NSInteger index, UIView *view);
+typedef void (^individualViewTapCallback)(NSInteger index, UIView *_Nonnull view);
+typedef UILabel * _Nonnull (^customIndividualViewInitCallback)(NSInteger index, NSString * _Nullable text, NSAttributedString * _Nullable attributedText);
 
 @interface LURollingLabel : UIView
 
-@property (nonatomic, strong) NSArray<NSString *> *texts;
-@property (nonatomic, strong) NSArray<NSAttributedString *> *attributedTexts;
-@property (nonatomic, assign) CGFloat rollSpeed; //default is 77;
-@property (nonatomic, assign) NSTimeInterval gapInterval; //default is 2s
-@property (nonatomic, strong) UIFont *textFont;
-@property (nonatomic, strong) UIColor *textColor;
-@property (nonatomic, assign) UIEdgeInsets edgeInsets;
-@property (nonatomic, assign) CGFloat innerGap;
-@property (nonatomic, assign) NSUInteger repeatCount;
-@property (nonatomic, assign) BOOL rollingAnyway;
-@property (nonatomic, assign) BOOL respondsToTap;
-@property (nonatomic, assign) LURollingLabelRollMode rollMode;
-@property (nonatomic, assign) LURollingLabelRollDiretion rollDirection;
-@property (nonatomic, copy, nonnull) individualViewTapCallback individualTapBlock;
+@property (nonatomic, strong, nullable) NSArray<NSString *> *texts;
+@property (nonatomic, strong, nullable) NSArray<NSAttributedString *> *attributedTexts;
+@property (nonatomic) CGFloat rollSpeed; //default is 77;
+@property (nonatomic) NSTimeInterval gapInterval; //default is 2s
+@property (nonatomic, strong, nullable) UIFont *textFont;
+@property (nonatomic, strong, nullable) UIColor *textColor;
+@property (nonatomic) UIEdgeInsets edgeInsets;
+@property (nonatomic) CGFloat innerGap;
+@property (nonatomic) NSUInteger repeatCount;
+@property (nonatomic) BOOL rollingAnyway;
+@property (nonatomic) BOOL respondsToTap;
+@property (nonatomic) LURollingLabelRollMode rollMode;
+@property (nonatomic) LURollingLabelRollDiretion rollDirection;
+@property (nonatomic, copy, nullable) individualViewTapCallback individualTapBlock;
+@property (nonatomic, copy, nullable) customIndividualViewInitCallback individualViewInitialBlock;
 
 @property (nonatomic, readonly) BOOL isRolling;
 
-- (id)initWithFrame:(CGRect)frame rollModel:(LURollingLabelRollMode)rollModel direction:(LURollingLabelRollDiretion)direction;
+- (_Nullable id)initWithFrame:(CGRect)frame rollModel:(LURollingLabelRollMode)rollModel direction:(LURollingLabelRollDiretion)direction;
 
 - (void)start;
 

@@ -46,13 +46,13 @@
         _rollSpeed = 77;
         _gapInterval = 2.0;
         _innerGap = 20.0;
-        _edgeInsets = UIEdgeInsetsMake(5, 0, 5, 0);
+        _edgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
         _rollMode = rollModel;
         _rollDirection = direction;
         self.scrollView.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
         [self addSubview:self.scrollView];
         
-
+        
     }
     return self;
 }
@@ -61,7 +61,6 @@
     [super layoutSubviews];
     self.scrollView.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
 }
-
 
 - (void)setFrame:(CGRect)frame {
     CGRect bounds = self.bounds;
@@ -101,8 +100,8 @@
         CFTimeInterval pausedTime = [label.layer convertTime:CACurrentMediaTime() fromLayer:nil];
         label.layer.speed = 0.0;
         label.layer.timeOffset = pausedTime;
-//        CGPoint position = ((CALayer *)label.layer.presentationLayer).position;
-//        label.layer.position = position;
+        //        CGPoint position = ((CALayer *)label.layer.presentationLayer).position;
+        //        label.layer.position = position;
     }];
     //self.scrollView.scrollEnabled = YES;
 }
@@ -153,7 +152,7 @@
             frameAnimation.fillMode = kCAFillModeBackwards;
             [label.layer addAnimation:frameAnimation forKey:@"rolling"];
             
-
+            
         } else if (self.rollMode == LURollingLabelRollModeGap) {
             CAKeyframeAnimation *frameAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.translation.x"];
             CGFloat prefix = label.frame.origin.x;
@@ -183,10 +182,10 @@
     } else if (self.rollDirection == LURollingLabelRollDiretionVertical) {
         switch (self.rollMode) {
             case LURollingLabelRollModeGapIndividually: {
-//                [UIView animateWithDuration:2.0 delay:0.0 options:UIViewAnimationOptionAllowUserInteraction animations:^{
-                    CAKeyframeAnimation *frameAnimation = [self getAnimationForModel:self.rollMode direction:self.rollDirection];
-                    [label.layer addAnimation:frameAnimation forKey:@"rolling"];
-//                } completion:nil];
+                //                [UIView animateWithDuration:2.0 delay:0.0 options:UIViewAnimationOptionAllowUserInteraction animations:^{
+                CAKeyframeAnimation *frameAnimation = [self getAnimationForModel:self.rollMode direction:self.rollDirection];
+                [label.layer addAnimation:frameAnimation forKey:@"rolling"];
+                //                } completion:nil];
                 break;
             }
             case LURollingLabelRollModeGap: {
@@ -212,14 +211,14 @@
             }
             case LURollingLabelRollModeAlways: {
                 CAKeyframeAnimation *frameAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.translation.y"];
-                CGFloat prefix = label.frame.origin.x;
-                CGFloat width = label.frame.size.width;
-                CGPoint lastPoint = [(NSValue *)[self getLabelOriginXsAndWidths].lastObject CGPointValue];
-                CGFloat suffix = lastPoint.x + lastPoint.y - prefix - width;
-                CGFloat length = prefix + width + suffix + self.innerGap;
-                frameAnimation.keyTimes = @[@0.0, @((prefix + width)/ length), @((prefix + width)/ length), @1.0];
+                CGFloat prefix = label.frame.origin.y;
+                CGFloat height = label.frame.size.height;
+                CGPoint lastPoint = [(NSValue *)[self getLabelOriginYsAndHeights].lastObject CGPointValue];
+                CGFloat suffix = lastPoint.x + lastPoint.y - prefix - height;
+                CGFloat length = prefix + height + suffix + self.innerGap;
+                frameAnimation.keyTimes = @[@0.0, @((prefix + height)/ length), @((prefix + height)/ length), @1.0];
                 frameAnimation.duration = length / self.rollSpeed;
-                frameAnimation.values = @[@0.0, @(-prefix - width), @(suffix + self.innerGap), @0.0];
+                frameAnimation.values = @[@0.0, @(-prefix - height), @(suffix + self.innerGap), @0.0];
                 frameAnimation.repeatCount = self.repeatCount == 0 ? NSUIntegerMax : self.repeatCount;
                 frameAnimation.calculationMode = kCAAnimationLinear;
                 frameAnimation.fillMode = kCAFillModeBackwards;
@@ -229,7 +228,7 @@
             default:
                 break;
         }
-      
+        
     }
     
 }
@@ -240,13 +239,13 @@
         switch (mode) {
             case LURollingLabelRollModeGapIndividually: {
                 frameAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.translation.x"];
-               
+                
                 NSArray<NSValue *> *widths = [self getLabelOriginXsAndWidths];
                 CGPoint lastPoint = [(NSValue *)widths.lastObject CGPointValue];
-
+                
                 CGFloat length = lastPoint.x + lastPoint.y + [self innerGapIndividuallyForView:nil widthOrHeight:lastPoint.y] + self.scrollView.frame.size.width;
                 NSTimeInterval moveDuration = length / self.rollSpeed;
-                NSTimeInterval totalDuration = moveDuration + self.gapInterval * (widths.count + 1);
+                NSTimeInterval totalDuration = moveDuration + self.gapInterval * widths.count;
                 NSMutableArray *keyTimes = [NSMutableArray array];
                 NSMutableArray *values = [NSMutableArray array];
                 CGFloat moved;
@@ -254,7 +253,7 @@
                 for (int i = 0; i < widths.count; i++) {
                     CGPoint point = [(NSValue *)widths[i] CGPointValue];
                     CGFloat width;
-
+                    
                     CGFloat individualGap = [self innerGapIndividuallyForView:nil widthOrHeight:point.y];
                     if (i == 0) {
                         width = point.x + point.y + individualGap;
@@ -283,10 +282,10 @@
                     [values addObject:@(0.0)];
                 }
                 
-
+                
                 frameAnimation.keyTimes = keyTimes;
                 
-                frameAnimation.duration = _gapInterval + moveDuration;
+                frameAnimation.duration = totalDuration;//_gapInterval + moveDuration;
                 frameAnimation.values = values;
                 frameAnimation.repeatCount = self.repeatCount == 0 ? NSUIntegerMax : self.repeatCount;
                 frameAnimation.calculationMode = kCAAnimationLinear;
@@ -316,7 +315,7 @@
                 for (int i = 0; i < widths.count; i++) {
                     CGPoint point = [(NSValue *)widths[i] CGPointValue];
                     CGFloat width;
-
+                    
                     CGFloat individualGap = [self innerGapIndividuallyForView:nil widthOrHeight:point.y];//deltaY > 0 ? deltaY : 0;
                     if (i == 0) {
                         
@@ -350,13 +349,13 @@
                 
                 frameAnimation.keyTimes = keyTimes;
                 
-                frameAnimation.duration = _gapInterval + moveDuration;
+                frameAnimation.duration = totalDuration;//_gapInterval + moveDuration;
                 frameAnimation.values = values;
                 frameAnimation.repeatCount = self.repeatCount == 0 ? NSUIntegerMax : self.repeatCount;
                 frameAnimation.calculationMode = kCAAnimationLinear;
                 frameAnimation.fillMode = kCAFillModeBackwards;
                 
-
+                
                 break;
             }
             default:
@@ -403,7 +402,7 @@
         }
     }
     return NO;
-   
+    
 }
 
 - (NSArray<NSValue *> *)getLabelOriginYsAndHeights {
@@ -433,7 +432,7 @@
 
 - (CGFloat)innerGapIndividuallyForView:(UIView *)view widthOrHeight:(CGFloat)widthOrHeight {
     CGFloat innerGap = -1;
-    if (self.rollMode = LURollingLabelRollModeGapIndividually) {
+    if (self.rollMode == LURollingLabelRollModeGapIndividually) {
         if (self.rollDirection == LURollingLabelRollDiretionHorizontal) {
             CGFloat width = view ? view.frame.size.width : widthOrHeight;
             CGFloat deltaX = self.scrollView.frame.size.width - width;
@@ -445,30 +444,13 @@
         }
     }
     return innerGap;
-
+    
 }
-// MARK: while keyframe animation, add tap to individual View failed!
-//- (void)individualViewDidTapped:(UIGestureRecognizer *)gesture {
-//    UIView *view = gesture.view;
-//    if (self.individualTapBlock) {
-//        self.individualTapBlock(view.tag, view);
-//    }
-//}
-//
-//
-//
-//- (void)addTapGestureToView:(UIView *)view {
-//    view.userInteractionEnabled = YES;
-//    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(individualViewDidTapped:)];
-//    [view addGestureRecognizer:tap];
-//}
-
-// MARK: use presationLayer
 
 - (void)forIndividualViewTapped:(UIGestureRecognizer *)gesture {
     for (UIView *view in self.scrollView.subviews) {
         CALayer *presentationlayer = [view.layer presentationLayer];
-        if (CGRectIntersectsRect(self.scrollView.bounds, presentationlayer.frame) && CGRectContainsPoint(presentationlayer.frame, [gesture locationInView:self.scrollView])) {
+        if (CGRectContainsPoint(presentationlayer.frame, [gesture locationInView:self.scrollView])) {
             if (self.individualTapBlock) {
                 self.individualTapBlock(view.tag, view);
             }
@@ -488,7 +470,7 @@
                 label.frame = CGRectMake(offsetx, weakSelf.edgeInsets.top, 0, 0);
                 label.tag = index;
                 [label sizeToFit];
-//                [weakSelf addTapGestureToView:label];
+                //                [weakSelf addTapGestureToView:label];
                 [weakSelf.labels addObject:label];
                 [weakSelf.scrollView addSubview:label];
                 CGFloat individualInnerGap = [self innerGapIndividuallyForView:label widthOrHeight:0];
@@ -501,7 +483,7 @@
                 label.frame = CGRectMake(offsetx, weakSelf.edgeInsets.top, 0, 0);
                 [label sizeToFit];
                 label.tag = index;
-//                [weakSelf addTapGestureToView:label];
+                //                [weakSelf addTapGestureToView:label];
                 [weakSelf.labels addObject:label];
                 [weakSelf.scrollView addSubview:label];
                 CGFloat individualInnerGap = [self innerGapIndividuallyForView:label widthOrHeight:0];
@@ -514,33 +496,51 @@
         if (_attributedTexts && _attributedTexts.count > 0) {
             __weak typeof(self) weakSelf = self;
             [_attributedTexts enumerateObjectsUsingBlock:^(NSAttributedString *_Nonnull text, NSUInteger index, BOOL *stop) {
-                UILabel *label = [weakSelf getLabelWithText:nil attributedText:text];
-                label.frame = CGRectMake(weakSelf.edgeInsets.left, offsetY, 0, 0);
-                [label sizeToFit];
-                label.tag = index;
-//                [weakSelf addTapGestureToView:label];
-                [weakSelf.labels addObject:label];
-                [weakSelf.scrollView addSubview:label];
-                CGFloat individualInnerGap = [self innerGapIndividuallyForView:label widthOrHeight:0];
-                offsetY += (individualInnerGap == -1 ? weakSelf.innerGap : individualInnerGap) + label.bounds.size.height;
+                UILabel *view;
+                if (weakSelf.individualViewInitialBlock) {
+                    view = weakSelf.individualViewInitialBlock(index, nil, text);
+                    CGRect frame = view.frame;
+                    frame.origin = CGPointMake(weakSelf.edgeInsets.left, offsetY);
+                    view.frame = frame;
+                } else {
+                    UILabel *label = [weakSelf getLabelWithText:nil attributedText:text];
+                    label.frame = CGRectMake(weakSelf.edgeInsets.left, offsetY, 0, 0);
+                    [label sizeToFit];
+                    label.tag = index;
+                    view = label;
+                }
+                [weakSelf.labels addObject:view];
+                [weakSelf.scrollView addSubview:view];
+                CGFloat individualInnerGap = [self innerGapIndividuallyForView:view widthOrHeight:0];
+                offsetY += (individualInnerGap == -1 ? weakSelf.innerGap : individualInnerGap) + view.bounds.size.height;
             }];
         } else {
             __weak typeof (self) weakSelf = self;
             [_texts enumerateObjectsUsingBlock:^(NSString * _Nonnull text, NSUInteger index, BOOL *stop) {
-                UILabel *label = [weakSelf getLabelWithText:text attributedText:nil];
-                label.frame = CGRectMake(weakSelf.edgeInsets.left, offsetY, 0, 0);
-                [label sizeToFit];
-                label.tag = index;
-//                [weakSelf addTapGestureToView:label];
-                [weakSelf.labels addObject:label];
-                [weakSelf.scrollView addSubview:label];
-                CGFloat individualInnerGap = [self innerGapIndividuallyForView:label widthOrHeight:0];
-                offsetY += (individualInnerGap == -1 ? weakSelf.innerGap : individualInnerGap) + label.bounds.size.height;
+                
+                UILabel *view;
+                if (weakSelf.individualViewInitialBlock) {
+                    view = weakSelf.individualViewInitialBlock(index, text, nil);
+                    CGRect frame = view.frame;
+                    frame.origin = CGPointMake(weakSelf.edgeInsets.left, offsetY);
+                    view.frame = frame;
+                } else {
+                    UILabel *label = [weakSelf getLabelWithText:text attributedText:nil];
+                    label.frame = CGRectMake(weakSelf.edgeInsets.left, offsetY, 0, 0);
+                    [label sizeToFit];
+                    label.tag = index;
+                    view = label;
+                }
+                
+                [weakSelf.labels addObject:view];
+                [weakSelf.scrollView addSubview:view];
+                CGFloat individualInnerGap = [self innerGapIndividuallyForView:view widthOrHeight:0];
+                offsetY += (individualInnerGap == -1 ? weakSelf.innerGap : individualInnerGap) + view.bounds.size.height;
             }];
         }
         self.scrollView.contentSize = CGSizeMake(self.scrollView.frame.size.width, offsetY);
     }
-        
+    
 }
 
 
@@ -549,14 +549,14 @@
     UILabel *label = [UILabel new];
     if (attrText) {
         label.attributedText = attrText;
-
+        
     } else {
         label.text = text;
     }
     label.font = self.textFont;
     label.textColor = self.textColor;
     return label;
-
+    
 }
 
 - (void)updateLabelColors {
@@ -586,7 +586,7 @@
     if (!_doubleTap) {
         _doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(startRolling:)];
         _doubleTap.numberOfTapsRequired = 2;
-
+        
     }
     return _doubleTap;
 }
@@ -606,7 +606,7 @@
 
 - (void)setTextFont:(UIFont *)textFont {
     _textFont = textFont;
-//    [self updateLabelFonts];
+    //    [self updateLabelFonts];
     [self updateContents];
 }
 
