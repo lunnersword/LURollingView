@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4373AAA834C380F676EF9B9B /* Pods_LURollingView_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D4CF91BB960A2723A54526E /* Pods_LURollingView_Tests.framework */; };
+		59C176011D5781D1000EC45E /* LUColoringBorderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 59C176001D5781D1000EC45E /* LUColoringBorderView.m */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
 		6003F592195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
@@ -40,6 +41,8 @@
 		1D32CD67B326EF0072D92E3F /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		48F830A993FDEF5E62428327 /* Pods_LURollingView_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LURollingView_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D8932577FCC711C09004CF2 /* Pods-LURollingView_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LURollingView_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-LURollingView_Example/Pods-LURollingView_Example.release.xcconfig"; sourceTree = "<group>"; };
+		59C175FF1D5781D1000EC45E /* LUColoringBorderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LUColoringBorderView.h; sourceTree = "<group>"; };
+		59C176001D5781D1000EC45E /* LUColoringBorderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LUColoringBorderView.m; sourceTree = "<group>"; };
 		6003F58A195388D20070C39A /* LURollingView_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LURollingView_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6003F58F195388D20070C39A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -135,6 +138,8 @@
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
 				6003F5A5195388D20070C39A /* LUViewController.h */,
 				6003F5A6195388D20070C39A /* LUViewController.m */,
+				59C175FF1D5781D1000EC45E /* LUColoringBorderView.h */,
+				59C176001D5781D1000EC45E /* LUColoringBorderView.m */,
 				6003F5A8195388D20070C39A /* Images.xcassets */,
 				6003F594195388D20070C39A /* Supporting Files */,
 			);
@@ -390,6 +395,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				59C176011D5781D1000EC45E /* LUColoringBorderView.m in Sources */,
 				6003F59E195388D20070C39A /* LUAppDelegate.m in Sources */,
 				6003F5A7195388D20070C39A /* LUViewController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
@@ -516,7 +522,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "LURollingView/LURollingView-Prefix.pch";
 				INFOPLIST_FILE = "LURollingView/LURollingView-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -533,7 +539,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "LURollingView/LURollingView-Prefix.pch";
 				INFOPLIST_FILE = "LURollingView/LURollingView-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";

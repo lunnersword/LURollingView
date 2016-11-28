@@ -7,6 +7,7 @@
 //
 
 #import "LUViewController.h"
+#import "LUColoringBorderView.h"
 #import <LURollingView/LURollingLabel.h>
 
 @interface LUViewController ()
@@ -25,10 +26,21 @@
     [self.button setTitle:@"Start Animation" forState:UIControlStateNormal];
     [self.button addTarget:self action:@selector(doButton) forControlEvents:UIControlEventTouchUpInside];
 
-    self.rollingLabel = [LURollingLabel new];
+    self.rollingLabel = [[LURollingLabel alloc] initWithFrame:CGRectZero rollModel:LURollingLabelRollModeGapIndividually direction:LURollingLabelRollDiretionHorizontal];
     self.rollingLabel.frame = (CGRectMake(0, 300, self.view.bounds.size.width, 100));
-    self.rollingLabel.texts = @[@"fuck ", @"do you love me", @"someOne payed someone some momey", @"you are young"];
+    self.rollingLabel.individualTapBlock = ^(NSInteger index, UIView *view) {
+        NSLog(@"INDIVIDUAL VIEW Tapped at index: %ld", index);
+    };
+    self.rollingLabel.respondsToTap = YES;
+    self.rollingLabel.texts = @[@"fuck ", @"do you love me", @"someOne payed someone some momey", @"you are young", @"faldkjdfalfja;lf alfjalkdfaa jalkfja;lfdja;lfkja;lfdjal;fja;lfjalfja;ldjalfjajfa;lfja;lfjalfjal;falfjalfjafjal;dfjafjafjaldfkafja;jfd;afj;alfja;lfja;ldjfal;fja;lfdjal;dfja;ldfja;lja lk ;lfjal;jfal;fdjal;fjal;fj;lajdf;lafj;ajfladfja;djalfja;fja;fja;lf;"];
     self.rollingLabel.rollingAnyway = YES;
+    
+//    LUColoringBorderView *borderView = [LUColoringBorderView new];
+//    borderView.frame = CGRectMake(0, 0, 100, 100);
+//    [self.view addSubview:borderView];
+    
+    UIView *slipView = [[UIView alloc] initWithFrame:CGRectMake(-50, 0, 50, 50)];
+//    slipView.backgroundColor = UIColor
     
     [self.view addSubview:self.button];
     [self.view addSubview:self.rollingLabel];
@@ -41,6 +53,7 @@
     //    [self transitionWithCIFilter];
     //    [self animationInUIView];
 }
+
 
 
 - (void)didReceiveMemoryWarning
