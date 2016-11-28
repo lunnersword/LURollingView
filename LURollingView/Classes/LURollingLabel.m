@@ -71,6 +71,7 @@
     [self updateContents];
 }
 
+// MARK: - Animation start, stop, suspend, resume, isRolling
 - (void)start {
     
     if (self.needRolling) {
@@ -132,7 +133,47 @@
     return isRolling;
 }
 
+- (BOOL)needRolling {
+    if (self.rollingAnyway) {
+        return YES;
+    }
+    if (self.rollDirection == LURollingLabelRollDiretionHorizontal) {
+        NSArray<NSValue *> *widths = [self getLabelOriginXsAndWidths];
+        if (widths && widths.count > 0) {
+            CGPoint point =  [(NSValue *)widths.lastObject CGPointValue];
+            CGFloat width = point.x + point.y;
+            if (width > self.frame.size.width) {
+                for (NSValue *value in widths) {
+                    point = [value CGPointValue];
+                    if (width - point.y + self.innerGap < self.frame.size.width) {
+                        return NO;
+                    }
+                }
+                return YES;
+            }
+        }
+        
+    } else {
+        NSArray<NSValue *> *heights = [self getLabelOriginYsAndHeights];
+        if (heights && heights.count > 0) {
+            CGPoint point = [(NSValue *)heights.lastObject CGPointValue];
+            CGFloat height = point.x + point.y;
+            if (height > self.frame.size.height) {
+                for (NSValue *value in heights) {
+                    point = [value CGPointValue];
+                    if (height - point.y + self.innerGap < self.frame.size.height) {
+                        return NO;
+                    }
+                }
+                return YES;
+            }
+        }
+    }
+    return NO;
+    
+}
 
+// MARK: - Create Animation
 
 - (void)addAnimationToLabel:(UILabel *)label {
     if (self.rollDirection == LURollingLabelRollDiretionHorizontal) {
@@ -364,45 +405,7 @@
     return frameAnimation;
 }
 
-- (BOOL)needRolling {
-    if (self.rollingAnyway) {
-        return YES;
-    }
-    if (self.rollDirection == LURollingLabelRollDiretionHorizontal) {
-        NSArray<NSValue *> *widths = [self getLabelOriginXsAndWidths];
-        if (widths && widths.count > 0) {
-            CGPoint point =  [(NSValue *)widths.lastObject CGPointValue];
-            CGFloat width = point.x + point.y;
-            if (width > self.frame.size.width) {
-                for (NSValue *value in widths) {
-                    point = [value CGPointValue];
-                    if (width - point.y + self.innerGap < self.frame.size.width) {
-                        return NO;
-                    }
-                }
-                return YES;
-            }
-        }
-        
-    } else {
-        NSArray<NSValue *> *heights = [self getLabelOriginYsAndHeights];
-        if (heights && heights.count > 0) {
-            CGPoint point = [(NSValue *)heights.lastObject CGPointValue];
-            CGFloat height = point.x + point.y;
-            if (height > self.frame.size.height) {
-                for (NSValue *value in heights) {
-                    point = [value CGPointValue];
-                    if (height - point.y + self.innerGap < self.frame.size.height) {
-                        return NO;
-                    }
-                }
-                return YES;
-            }
-        }
-    }
-    return NO;
-    
-}
+// MARK: - Get origin.x origin.y width height gaps
 
 - (NSArray<NSValue *> *)getLabelOriginYsAndHeights {
     NSMutableArray *array = [NSMutableArray array];
@@ -456,6 +459,8 @@
         }
     }
 }
+
+// MARK: - Create individual views
 
 - (void)updateContents {
     [self.scrollView.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
@@ -580,7 +585,7 @@
 }
 
 
-
+// MARK: - Properties
 
 - (UITapGestureRecognizer *)tap {
     if (!_tap) {
