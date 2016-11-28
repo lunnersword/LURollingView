@@ -175,7 +175,7 @@
 
 // MARK: - Create Animation
 
-- (void)addAnimationToLabel:(UILabel *)label {
+- (void)addAnimationToLabel:(UIView *)label {
     if (self.rollDirection == LURollingLabelRollDiretionHorizontal) {
         if (self.rollMode == LURollingLabelRollModeAlways) {
             CAKeyframeAnimation *frameAnimation = [CAKeyframeAnimation animationWithKeyPath:@"transform.translation.x"];
@@ -624,7 +624,7 @@
     [self updateContents];
 }
 
-- (NSMutableArray<UILabel *> *)labels {
+- (NSMutableArray<UIView *> *)labels {
     if (!_labels) {
         _labels = [NSMutableArray array];
     }
