@@ -28,8 +28,6 @@ typedef UILabel * _Nonnull (^customIndividualViewInitCallback)(NSInteger index, 
 @property (nonatomic, strong, nullable) NSArray<NSAttributedString *> *attributedTexts;
 @property (nonatomic) CGFloat rollSpeed; //default is 77;
 @property (nonatomic) NSTimeInterval gapInterval; //default is 2s
-@property (nonatomic, strong, nullable) UIFont *textFont;
-@property (nonatomic, strong, nullable) UIColor *textColor;
 @property (nonatomic) UIEdgeInsets edgeInsets;
 @property (nonatomic) CGFloat innerGap;
 @property (nonatomic) NSUInteger repeatCount;
@@ -39,10 +37,11 @@ typedef UILabel * _Nonnull (^customIndividualViewInitCallback)(NSInteger index, 
 @property (nonatomic) LURollingLabelRollDiretion rollDirection;
 @property (nonatomic, copy, nullable) individualViewTapCallback individualTapBlock;
 @property (nonatomic, copy, nullable) customIndividualViewInitCallback individualViewInitialBlock;
+@property (nonatomic, readonly, nullable) Class individualViewCustomClass;
 
 @property (nonatomic, readonly) BOOL isRolling;
 
-- (_Nullable id)initWithFrame:(CGRect)frame rollModel:(LURollingLabelRollMode)rollModel direction:(LURollingLabelRollDiretion)direction;
+- (_Nullable id)initWithFrame:(CGRect)frame rollModel:(LURollingLabelRollMode)rollModel direction:(LURollingLabelRollDiretion)direction customClass:(Class _Nullable)customClass;
 
 - (void)start;
 
