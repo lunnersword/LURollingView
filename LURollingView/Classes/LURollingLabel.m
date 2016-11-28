@@ -11,7 +11,7 @@
 @interface LURollingLabel ()
 
 @property (nonatomic, readonly) BOOL needRolling;
-@property (nonatomic, strong) NSMutableArray<UILabel *> *labels;
+@property (nonatomic, strong) NSMutableArray<UIView *> *labels;
 @property (nonatomic, strong) UIScrollView *scrollView;
 @property (nonatomic, strong) UITapGestureRecognizer *tap;
 @property (nonatomic, strong) UITapGestureRecognizer *doubleTap;
@@ -20,8 +20,8 @@
 
 @implementation LURollingLabel (CircleArray)
 
-- (UILabel *)getLabel {
-    UILabel *label = self.labels.firstObject;
+- (UIView *)getLabel {
+    UIView *label = self.labels.firstObject;
     [self.labels removeObjectAtIndex:0];
     [self.labels addObject:label];
     return label;
@@ -31,16 +31,14 @@
 
 @implementation LURollingLabel
 
-@synthesize textColor = _textColor;
-@synthesize textFont = _textFont;
 
 - (id)init {
     return [self initWithFrame:CGRectMake(0, 0, 0, 0)];
 }
 - (id)initWithFrame:(CGRect)frame {
-    return [self initWithFrame:CGRectMake(0, 0, 0, 0) rollModel:LURollingLabelRollModeAlways direction:LURollingLabelRollDiretionHorizontal];
+    return [self initWithFrame:CGRectMake(0, 0, 0, 0) rollModel:LURollingLabelRollModeAlways direction:LURollingLabelRollDiretionHorizontal customClass:[UILabel class]];
 }
-- (id)initWithFrame:(CGRect)frame rollModel:(LURollingLabelRollMode)rollModel direction:(LURollingLabelRollDiretion)direction {
+- (id)initWithFrame:(CGRect)frame rollModel:(LURollingLabelRollMode)rollModel direction:(LURollingLabelRollDiretion)direction customClass:(__unsafe_unretained Class)customClass {
     self = [super initWithFrame:frame];
     if (self) {
         _rollSpeed = 77;
@@ -49,6 +47,7 @@
         _edgeInsets = UIEdgeInsetsMake(0, 0, 0, 0);
         _rollMode = rollModel;
         _rollDirection = direction;
+        _individualViewCustomClass = customClass;
         self.scrollView.frame = CGRectMake(0, 0, frame.size.width, frame.size.height);
         [self addSubview:self.scrollView];
         
@@ -77,7 +76,7 @@
     if (self.needRolling) {
         self.scrollView.scrollEnabled = NO;
         __weak typeof (self) weakSelf = self;
-        [self.labels enumerateObjectsUsingBlock:^(UILabel *label, NSUInteger index, BOOL *stop) {
+        [self.labels enumerateObjectsUsingBlock:^(UIView *label, NSUInteger index, BOOL *stop) {
             [label.layer removeAllAnimations];
             [weakSelf addAnimationToLabel:label];
         }];
@@ -89,14 +88,14 @@
 
 
 - (void)stop {
-    [self.labels enumerateObjectsUsingBlock:^(UILabel *label, NSUInteger index, BOOL *stop) {
+    [self.labels enumerateObjectsUsingBlock:^(UIView *label, NSUInteger index, BOOL *stop) {
         [label.layer removeAllAnimations];
     }];
     self.scrollView.scrollEnabled = YES;
 }
 
 - (void)suspend {
-    [self.labels enumerateObjectsUsingBlock:^(UILabel *label, NSUInteger index, BOOL *stop) {
+    [self.labels enumerateObjectsUsingBlock:^(UIView *label, NSUInteger index, BOOL *stop) {
         CFTimeInterval pausedTime = [label.layer convertTime:CACurrentMediaTime() fromLayer:nil];
         label.layer.speed = 0.0;
         label.layer.timeOffset = pausedTime;
@@ -112,7 +111,7 @@
 
 - (void)resume {
     self.scrollView.scrollEnabled = NO;
-    [self.labels enumerateObjectsUsingBlock:^(UILabel *label, NSUInteger index, BOOL *stop) {
+    [self.labels enumerateObjectsUsingBlock:^(UIView *label, NSUInteger index, BOOL *stop) {
         CFTimeInterval pausedTime = [label.layer timeOffset];
         label.layer.speed = 1.0;
         label.layer.timeOffset = 0.0;
@@ -125,7 +124,7 @@
 
 - (BOOL)isRolling {
     BOOL __block isRolling = NO;
-    [self.labels enumerateObjectsUsingBlock:^(UILabel *label, NSUInteger index, BOOL *stop) {
+    [self.labels enumerateObjectsUsingBlock:^(UIView *label, NSUInteger index, BOOL *stop) {
         if ([label.layer animationForKey:@"rolling"] && label.layer.speed != 0.0) {
             isRolling = YES;
         }
@@ -407,7 +406,7 @@
 
 - (NSArray<NSValue *> *)getLabelOriginYsAndHeights {
     NSMutableArray *array = [NSMutableArray array];
-    [self.labels enumerateObjectsUsingBlock:^(UILabel *label, NSUInteger index, BOOL *stop) {
+    [self.labels enumerateObjectsUsingBlock:^(UIView *label, NSUInteger index, BOOL *stop) {
         CGPoint point;
         point.x = label.frame.origin.y;
         point.y = label.frame.size.height;
@@ -420,7 +419,7 @@
 
 - (NSArray<NSValue *> *)getLabelOriginXsAndWidths {
     NSMutableArray *array = [NSMutableArray array];
-    [self.labels enumerateObjectsUsingBlock:^(UILabel *label, NSUInteger index, BOOL *stop) {
+    [self.labels enumerateObjectsUsingBlock:^(UIView *label, NSUInteger index, BOOL *stop) {
         CGPoint point;
         point.x = label.frame.origin.x;
         point.y = label.frame.size.width;
@@ -466,28 +465,49 @@
         if (_attributedTexts && _attributedTexts.count > 0) {
             __weak typeof(self) weakSelf = self;
             [_attributedTexts enumerateObjectsUsingBlock:^(NSAttributedString *_Nonnull text, NSUInteger index, BOOL *stop) {
-                UILabel *label = [weakSelf getLabelWithText:nil attributedText:text];
-                label.frame = CGRectMake(offsetx, weakSelf.edgeInsets.top, 0, 0);
-                label.tag = index;
-                [label sizeToFit];
+                UIView *view;
+                if (self.individualViewInitialBlock) {
+                    view = self.individualViewInitialBlock(index, nil, text);
+                    CGRect frame = view.frame;
+                    frame.origin = CGPointMake(offsetx, weakSelf.edgeInsets.top);
+                    view.frame = frame;
+
+                } else {
+                    UILabel *label = [weakSelf getLabelWithText:nil attributedText:text];
+                    label.frame = CGRectMake(offsetx, weakSelf.edgeInsets.top, 0, 0);
+                    label.tag = index;
+                    [label sizeToFit];
+                    view = label;
+                }
+                
                 //                [weakSelf addTapGestureToView:label];
-                [weakSelf.labels addObject:label];
-                [weakSelf.scrollView addSubview:label];
-                CGFloat individualInnerGap = [self innerGapIndividuallyForView:label widthOrHeight:0];
-                offsetx += (individualInnerGap == -1 ? weakSelf.innerGap : individualInnerGap) + label.bounds.size.width;
+                [weakSelf.labels addObject:view];
+                [weakSelf.scrollView addSubview:view];
+                CGFloat individualInnerGap = [self innerGapIndividuallyForView:view widthOrHeight:0];
+                offsetx += (individualInnerGap == -1 ? weakSelf.innerGap : individualInnerGap) + view.bounds.size.width;
             }];
         } else {
             __weak typeof (self) weakSelf = self;
             [_texts enumerateObjectsUsingBlock:^(NSString * _Nonnull text, NSUInteger index, BOOL *stop) {
-                UILabel *label = [weakSelf getLabelWithText:text attributedText:nil];
-                label.frame = CGRectMake(offsetx, weakSelf.edgeInsets.top, 0, 0);
-                [label sizeToFit];
-                label.tag = index;
+                UIView *view;
+                if (self.individualViewInitialBlock) {
+                    view = self.individualViewInitialBlock(index, text, nil);
+                    CGRect frame = view.frame;
+                    frame.origin = CGPointMake(offsetx, weakSelf.edgeInsets.top);
+                    view.frame = frame;
+                } else {
+                    UILabel *label = [weakSelf getLabelWithText:text attributedText:nil];
+                    label.frame = CGRectMake(offsetx, weakSelf.edgeInsets.top, 0, 0);
+                    [label sizeToFit];
+                    label.tag = index;
+                    view = label;
+                }
+                
                 //                [weakSelf addTapGestureToView:label];
-                [weakSelf.labels addObject:label];
-                [weakSelf.scrollView addSubview:label];
-                CGFloat individualInnerGap = [self innerGapIndividuallyForView:label widthOrHeight:0];
-                offsetx += (individualInnerGap == -1 ? weakSelf.innerGap : individualInnerGap) + label.bounds.size.width;
+                [weakSelf.labels addObject:view];
+                [weakSelf.scrollView addSubview:view];
+                CGFloat individualInnerGap = [self innerGapIndividuallyForView:view widthOrHeight:0];
+                offsetx += (individualInnerGap == -1 ? weakSelf.innerGap : individualInnerGap) + view.bounds.size.width;
             }];
         }
         self.scrollView.contentSize = CGSizeMake(offsetx, self.scrollView.frame.size.height);
@@ -496,7 +516,7 @@
         if (_attributedTexts && _attributedTexts.count > 0) {
             __weak typeof(self) weakSelf = self;
             [_attributedTexts enumerateObjectsUsingBlock:^(NSAttributedString *_Nonnull text, NSUInteger index, BOOL *stop) {
-                UILabel *view;
+                UIView *view;
                 if (weakSelf.individualViewInitialBlock) {
                     view = weakSelf.individualViewInitialBlock(index, nil, text);
                     CGRect frame = view.frame;
@@ -518,7 +538,7 @@
             __weak typeof (self) weakSelf = self;
             [_texts enumerateObjectsUsingBlock:^(NSString * _Nonnull text, NSUInteger index, BOOL *stop) {
                 
-                UILabel *view;
+                UIView *view;
                 if (weakSelf.individualViewInitialBlock) {
                     view = weakSelf.individualViewInitialBlock(index, text, nil);
                     CGRect frame = view.frame;
@@ -559,20 +579,8 @@
     
 }
 
-- (void)updateLabelColors {
-    __weak typeof (self) weakSelf = self;
-    [self.labels enumerateObjectsUsingBlock:^(UILabel *label, NSUInteger index, BOOL *stop) {
-        label.textColor = weakSelf.textColor;
-    }];
-}
 
-- (void)updateLabelFonts {
-    __weak typeof (self) weakSelf = self;
-    [self.labels enumerateObjectsUsingBlock:^(UILabel *label, NSUInteger index, BOOL *stop) {
-        label.font = weakSelf.textFont;
-        // TODO: Need recalculate the labels' frame
-    }];
-}
+
 
 - (UITapGestureRecognizer *)tap {
     if (!_tap) {
@@ -595,20 +603,11 @@
     return [UIColor blackColor];
 }
 
-- (void)setTextColor:(UIColor *)textColor {
-    _textColor = textColor;
-    [self updateLabelColors];
-}
 
 - (UIFont *)textFont {
     return [UIFont systemFontOfSize:15];
 }
 
-- (void)setTextFont:(UIFont *)textFont {
-    _textFont = textFont;
-    //    [self updateLabelFonts];
-    [self updateContents];
-}
 
 - (void)setTexts:(NSArray<NSString *> *)texts {
     _texts = texts;
